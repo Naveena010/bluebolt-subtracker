@@ -53,6 +53,15 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.badRequest().body(errors);
     }
+    @ExceptionHandler(CouponAlreadyRedeemedException.class)
+    public ResponseEntity<ErrorResponse> handleCouponAlreadyRedeemed(CouponAlreadyRedeemedException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(SubscriptionInactiveException.class)
+    public ResponseEntity<ErrorResponse> handleSubscriptionInactive(SubscriptionInactiveException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
