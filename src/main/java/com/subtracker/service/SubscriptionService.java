@@ -2,6 +2,7 @@ package com.subtracker.service;
 
 import com.subtracker.dto.request.SubscriptionRequest;
 import com.subtracker.dto.request.UsageUpdateRequest;
+import com.subtracker.dto.response.PageResponse;
 import com.subtracker.dto.response.SubscriptionResponse;
 import com.subtracker.entity.Subscription;
 import com.subtracker.entity.User;
@@ -10,10 +11,11 @@ import com.subtracker.exception.UnauthorizedActionException;
 import com.subtracker.mapper.SubscriptionMapper;
 import com.subtracker.repository.SubscriptionRepository;
 import com.subtracker.security.SecurityUtil;
+import com.subtracker.util.PageMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +30,10 @@ public class SubscriptionService {
         return SubscriptionMapper.toResponse(subscription);
     }
 
-    public List<SubscriptionResponse> getMySubscriptions() {
+    public PageResponse<SubscriptionResponse> getMySubscriptions(Pageable pageable) {
         User currentUser = SecurityUtil.getCurrentUser();
-        return subscriptionRepository.findByUserId(currentUser.getId())
-                .stream()
-                .map(SubscriptionMapper::toResponse)
-                .toList();
+        Page<Subscription> subscriptions = subscriptionRepository.findByUserId(currentUser.getId(), pageable);
+        return PageMapper.toPageResponse(subscriptions, SubscriptionMapper::toResponse);
     }
 
     public SubscriptionResponse getSubscriptionById(Long id) {

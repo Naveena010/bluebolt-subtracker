@@ -4,6 +4,7 @@ import com.subtracker.entity.Notification;
 import com.subtracker.entity.Subscription;
 import com.subtracker.repository.NotificationRepository;
 import com.subtracker.repository.SubscriptionRepository;
+import com.subtracker.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class SubscriptionAlertScheduler {
 
     private final SubscriptionRepository subscriptionRepository;
     private final NotificationRepository notificationRepository;
+    private final EmailService emailService;
 
     private static final int ALERT_DAYS_BEFORE_BILLING = 3;
 
@@ -44,6 +46,12 @@ public class SubscriptionAlertScheduler {
                     .build();
 
             notificationRepository.save(notification);
+
+            emailService.sendAlertEmail(
+                    subscription.getUser().getEmail(),
+                    "Subscription Alert: " + subscription.getServiceName(),
+                    message
+            );
         }
     }
 }
