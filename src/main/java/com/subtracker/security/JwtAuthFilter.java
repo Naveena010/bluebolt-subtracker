@@ -29,8 +29,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                     @NonNull HttpServletResponse response,
-                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
 
@@ -43,13 +43,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (jwtUtil.isTokenValid(token)) {
             String email = jwtUtil.extractEmail(token);
-            String role = jwtUtil.extractRole(token);
+            String role = jwtUtil.extractRole(token);   // <-- role read from token
 
             User user = userRepository.findByEmail(email).orElse(null);
 
             if (user != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var authToken = new UsernamePasswordAuthenticationToken(
-                        user, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                        user, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))   // <-- "ROLE_" prefix required by Spring Security
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

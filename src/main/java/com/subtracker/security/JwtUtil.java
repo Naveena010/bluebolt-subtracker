@@ -26,7 +26,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .subject(email)
-                .claim("role", role)
+                .claim("role", role)   // <-- role stored directly inside the token
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(getKey())

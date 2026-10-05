@@ -35,7 +35,7 @@ public class BootstrapController {
                 .fullName(request.fullName())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.ADMIN)
+                .role(Role.ADMIN)   // <-- the only ADMIN ever created this way
                 .build();
 
         userRepository.save(admin);

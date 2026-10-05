@@ -3,6 +3,7 @@ package com.subtracker.controller;
 import com.subtracker.dto.request.LoginRequest;
 import com.subtracker.dto.request.RegisterRequest;
 import com.subtracker.dto.response.AuthResponse;
+import com.subtracker.dto.response.UserResponse;
 import com.subtracker.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 

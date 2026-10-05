@@ -1,12 +1,15 @@
 package com.subtracker.service;
 
+import com.subtracker.dto.request.CreateUserRequest;
 import com.subtracker.dto.request.LoginRequest;
 import com.subtracker.dto.request.RegisterRequest;
 import com.subtracker.dto.response.AuthResponse;
+import com.subtracker.dto.response.UserResponse;
 import com.subtracker.entity.User;
 import com.subtracker.enums.Role;
 import com.subtracker.exception.DuplicateResourceException;
 import com.subtracker.exception.InvalidCredentialsException;
+import com.subtracker.mapper.UserMapper;
 import com.subtracker.repository.UserRepository;
 import com.subtracker.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +24,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse register(RegisterRequest request) {
+    public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new DuplicateResourceException("Email already registered: " + request.email());
         }
@@ -30,13 +33,11 @@ public class AuthService {
                 .fullName(request.fullName())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.CUSTOMER) // self-registration is always CUSTOMER
+                .role(Role.CUSTOMER)
                 .build();
 
         userRepository.save(user);
-
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
-        return new AuthResponse(token, user.getEmail(), user.getRole().name());
+        return UserMapper.toResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -49,5 +50,21 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(token, user.getEmail(), user.getRole().name());
+    }
+
+    public UserResponse createUserByAdmin(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email already registered: " + request.email());
+        }
+
+        User user = User.builder()
+                .fullName(request.fullName())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(request.role())
+                .build();
+
+        userRepository.save(user);
+        return UserMapper.toResponse(user);
     }
 }
