@@ -13,7 +13,6 @@ class JwtUtilTest {
     @BeforeEach
     void setUp() {
         jwtUtil = new JwtUtil();
-        // inject @Value fields directly since there's no Spring context in a plain unit test
         ReflectionTestUtils.setField(jwtUtil, "secret", "ThisIsA256BitSecretKeyForJWTSigningChangeThisInProduction123");
         ReflectionTestUtils.setField(jwtUtil, "expiration", 86400000L);
     }

@@ -1,20 +1,21 @@
 package com.subtracker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.subtracker.config.SecurityConfig;
 import com.subtracker.dto.request.SubscriptionRequest;
 import com.subtracker.dto.request.UsageUpdateRequest;
 import com.subtracker.dto.response.PageResponse;
 import com.subtracker.dto.response.SubscriptionResponse;
-import com.subtracker.entity.User;
-import com.subtracker.enums.Role;
 import com.subtracker.exception.ResourceNotFoundException;
 import com.subtracker.exception.UnauthorizedActionException;
-import com.subtracker.security.JwtAuthFilter;
+import com.subtracker.repository.UserRepository;
+import com.subtracker.security.JwtUtil;
 import com.subtracker.service.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SubscriptionController.class)
+@Import(SecurityConfig.class)
 class SubscriptionControllerTest {
 
     @Autowired
@@ -43,7 +45,10 @@ class SubscriptionControllerTest {
     private SubscriptionService subscriptionService;
 
     @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private UserRepository userRepository;
 
     private SubscriptionResponse sampleResponse() {
         return new SubscriptionResponse(

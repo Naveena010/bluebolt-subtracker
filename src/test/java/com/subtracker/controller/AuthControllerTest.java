@@ -1,18 +1,21 @@
 package com.subtracker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.subtracker.config.SecurityConfig;
 import com.subtracker.dto.request.LoginRequest;
 import com.subtracker.dto.request.RegisterRequest;
 import com.subtracker.dto.response.AuthResponse;
 import com.subtracker.dto.response.UserResponse;
 import com.subtracker.exception.DuplicateResourceException;
 import com.subtracker.exception.InvalidCredentialsException;
-import com.subtracker.security.JwtAuthFilter;
+import com.subtracker.repository.UserRepository;
+import com.subtracker.security.JwtUtil;
 import com.subtracker.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
+@Import(SecurityConfig.class)
 class AuthControllerTest {
 
     @Autowired
@@ -33,9 +37,12 @@ class AuthControllerTest {
     @MockBean
     private AuthService authService;
 
-    // Required because SecurityConfig wires this filter into every request chain
+    // Mocked so the REAL JwtAuthFilter can be constructed by Spring (do NOT mock JwtAuthFilter itself)
     @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     void register_returns200AndUserResponse_whenRequestIsValid() throws Exception {

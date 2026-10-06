@@ -1,14 +1,17 @@
 package com.subtracker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.subtracker.config.SecurityConfig;
 import com.subtracker.dto.request.CouponRequest;
 import com.subtracker.dto.response.CouponResponse;
-import com.subtracker.security.JwtAuthFilter;
+import com.subtracker.repository.UserRepository;
+import com.subtracker.security.JwtUtil;
 import com.subtracker.service.CouponService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminCouponController.class)
+@Import(SecurityConfig.class)
 class AdminCouponControllerTest {
 
     @Autowired
@@ -34,7 +38,10 @@ class AdminCouponControllerTest {
     private CouponService couponService;
 
     @MockBean
-    private JwtAuthFilter jwtAuthFilter;
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private UserRepository userRepository;
 
     private CouponResponse sampleCoupon() {
         return new CouponResponse(100L, "SAVE20", 20.0, LocalDate.now().plusDays(30), true, "admin@subtracker.com");
